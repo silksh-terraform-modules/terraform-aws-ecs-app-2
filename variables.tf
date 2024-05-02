@@ -286,3 +286,9 @@ variable "stop_timeout" {
   description = "stop timeout before SIGKILL"
   type = number
 }
+
+variable purchase_option {
+  type        = string
+  default     = ""
+  description = "pass any preconfigured value of purchase-option attribute to have ability to control on which machine task should start"
+}

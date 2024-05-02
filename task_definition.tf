@@ -23,7 +23,7 @@ locals {
 module "container" {
   count = var.cloudwatch_multiline_pattern == "" ? 0 : 1
   source  = "cloudposse/ecs-container-definition/aws"
-  version = "0.58.1"
+  version = "v0.61.1"
   
   container_name  = var.service_name
   container_image = "${var.ecr_repository_url}:${var.docker_image_tag}"
@@ -56,7 +56,7 @@ module "container" {
 module "container_no_multiline" {
   count = var.cloudwatch_multiline_pattern == "" ? 1 : 0
   source  = "cloudposse/ecs-container-definition/aws"
-  version = "0.58.1"
+  version = "v0.61.1"
   
   container_name  = var.service_name
   container_image = "${var.ecr_repository_url}:${var.docker_image_tag}"

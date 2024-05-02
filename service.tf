@@ -44,6 +44,14 @@ resource "aws_ecs_service" "this" {
         type  = "spread"
     }
 
+    dynamic placement_constraints {
+      for_each = length(var.purchase_option) > 0 ? [1] : []
+      content {
+        type  = "memberOf"
+        expression = "attribute:purchase-option == ${var.purchase_option}"
+      }
+    }
+
     depends_on = [
       aws_lb_target_group.this[0]
     ]
