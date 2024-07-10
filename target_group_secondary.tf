@@ -1,7 +1,7 @@
 resource "aws_lb_target_group" "secondary" {
     count = length(var.lb_listener_arn_secondary) > 0 ? 1 : 0      
     deregistration_delay          = var.deregistration_delay
-    load_balancing_algorithm_type = "round_robin"
+    load_balancing_algorithm_type = var.load_balancing_algorithm_type_secondary
     name                          = "${var.service_name}-${var.env_name}-internal-${substr(uuid(), 0, 3)}"
     port                          = length(var.container_port_secondary) > 0 ? var.container_port_secondary : var.container_port 
     protocol                      = "HTTP"

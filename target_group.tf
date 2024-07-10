@@ -1,7 +1,7 @@
 resource "aws_lb_target_group" "this" {
     count = length(var.service_dns_name) > 0 ? 1 : 0
     deregistration_delay          = var.deregistration_delay
-    load_balancing_algorithm_type = "round_robin"
+    load_balancing_algorithm_type = var.load_balancing_algorithm_type
     name                          = "${var.service_name}-${var.env_name}-${substr(uuid(), 0, 3)}"
     port                          = var.container_port
     protocol                      = "HTTP"

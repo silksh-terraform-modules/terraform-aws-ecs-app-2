@@ -292,3 +292,11 @@ variable purchase_option {
   default     = ""
   description = "pass any preconfigured value of purchase-option attribute to have ability to control on which machine task should start"
 }
+
+variable "load_balancing_algorithm_type" {
+  default = "round_robin"
+}
+
+variable "load_balancing_algorithm_type_secondary" {
+  default = "round_robin"
+}
