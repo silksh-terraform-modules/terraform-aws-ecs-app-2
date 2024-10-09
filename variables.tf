@@ -233,6 +233,12 @@ variable "gitlab_branch" {
   default = "main"
 }
 
+variable "gitlab_project_id" {
+  default = 0
+  # type = number
+  description = "first project on gitlab have id = 1 so 0 = not create"
+}
+
 variable "deployer_id" {
   default = ""
 }
