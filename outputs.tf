@@ -9,3 +9,7 @@ output "app_fqdn_secondary" {
 output "aws_lb_target_group_arn" {
   value = try(aws_lb_target_group.this[0].arn, "")
 }
+
+output "app_service_name" {
+  value = aws_ecs_service.this.name
+}
