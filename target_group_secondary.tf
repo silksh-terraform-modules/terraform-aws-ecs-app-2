@@ -47,6 +47,17 @@ resource "aws_lb_listener_rule" "secondary" {
     }
   }
 
+  dynamic "condition" {
+    for_each = var.security_header_secondary != null ? [var.security_header_secondary] : []
+
+    content {
+      http_header {
+        http_header_name   = condition.value.header_name
+        values = condition.value.values
+      }
+    }
+  }
+
   action {
     target_group_arn = aws_lb_target_group.secondary[0].arn
     type             = "forward"

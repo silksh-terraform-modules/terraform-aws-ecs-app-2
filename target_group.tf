@@ -51,6 +51,17 @@ resource "aws_lb_listener_rule" "this" {
     }
   }
 
+  dynamic "condition" {
+    for_each = var.security_header != null ? [var.security_header] : []
+
+    content {
+      http_header {
+        http_header_name   = condition.value.header_name
+        values = condition.value.values
+      }
+    }
+  }
+
   action {
     target_group_arn = aws_lb_target_group.this[0].arn
     type             = "forward"

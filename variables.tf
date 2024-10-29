@@ -300,3 +300,11 @@ variable "load_balancing_algorithm_type" {
 variable "load_balancing_algorithm_type_secondary" {
   default = "round_robin"
 }
+
+variable "security_header" {
+  default = null
+}
+
+variable "security_header_secondary" {
+  default = null
+}
