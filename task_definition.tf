@@ -35,12 +35,14 @@ module "container" {
 
   log_configuration = {
     logDriver = "awslogs",
-    options = {
+    options = merge(
+    {
       awslogs-region = var.aws_region,
       awslogs-group = var.cloudwatch_log_group,
-      awslogs-stream-prefix = var.env_name,
-      awslogs-multiline-pattern = var.cloudwatch_multiline_pattern
-    }
+      awslogs-stream-prefix = var.env_name
+    },
+    var.cloudwatch_multiline_pattern != null ? { awslogs-multiline-pattern = var.cloudwatch_multiline_pattern } : {}
+  )
   }
   
   port_mappings = length(var.service_dns_name) > 0 ? local.port_mappings : null
@@ -53,38 +55,6 @@ module "container" {
   stop_timeout      = var.stop_timeout
 }
 
-module "container_no_multiline" {
-  count = var.cloudwatch_multiline_pattern == "" ? 1 : 0
-  source  = "cloudposse/ecs-container-definition/aws"
-  version = "v0.61.1"
-  
-  container_name  = var.service_name
-  container_image = "${var.ecr_repository_url}:${var.docker_image_tag}"
-
-  container_cpu = var.cpu_limit
-  container_memory = var.memory_limit
-
-  essential = true
-
-  log_configuration = {
-    logDriver = "awslogs",
-    options = {
-      awslogs-region = var.aws_region,
-      awslogs-group = var.cloudwatch_log_group,
-      awslogs-stream-prefix = var.env_name,
-      # awslogs-multiline-pattern = var.cloudwatch_multiline_pattern
-    }
-  }
-  
-  port_mappings = length(var.service_dns_name) > 0 ? local.port_mappings : null
-
-  map_secrets       = var.ssm_variables
-  map_environment   = var.task_variables
-  mount_points      = var.mount_points
-  environment_files = var.environment_files
-  healthcheck       = var.healthcheck
-  stop_timeout      = var.stop_timeout
-}
 
 resource "aws_ecs_task_definition" "this" {
   family                   = "${var.service_name}-${var.env_name}"
@@ -94,7 +64,7 @@ resource "aws_ecs_task_definition" "this" {
   network_mode             = "bridge"
   task_role_arn            = var.ecs_role_arn
 
-  container_definitions = var.cloudwatch_multiline_pattern == "" ? module.container_no_multiline[0].json_map_encoded_list :  module.container[0].json_map_encoded_list
+  container_definitions = module.container[0].json_map_encoded_list
   
   lifecycle {
     create_before_destroy = true
