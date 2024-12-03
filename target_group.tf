@@ -43,10 +43,10 @@ resource "aws_lb_listener_rule" "this" {
       values = (
         length(var.other_service_dns_names) > 0 ? 
           concat(
-            [aws_route53_record.this[0].name],
+            var.service_dns_name,
             var.other_service_dns_names
           ) :
-        [aws_route53_record.this[0].name]
+        var.service_dns_name[aws_route53_record.this[0].name]
       )
     }
   }
