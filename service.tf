@@ -9,7 +9,7 @@ resource "aws_ecs_service" "this" {
     name                               = var.service_name
     #propagate_tags                     = "NONE"
     scheduling_strategy                = "REPLICA"
-    task_definition                    = aws_ecs_task_definition.this.arn
+    task_definition                    = var.limit_cpu_mem ? aws_ecs_task_definition.this[0].arn : aws_ecs_task_definition.this_no_limits[0].arn
     enable_execute_command             = var.enable_execute_command
 
     deployment_controller {

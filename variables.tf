@@ -308,3 +308,8 @@ variable "security_header" {
 variable "security_header_secondary" {
   default = null
 }
+
+variable "limit_cpu_mem" {
+  type = bool
+  default = false
+}

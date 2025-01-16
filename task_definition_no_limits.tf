@@ -1,35 +1,10 @@
-locals {
-  port_mappings = length(var.container_port_secondary) > 0 ? [
-    {
-      containerPort = var.container_port
-      hostPort      = var.host_port
-      protocol      = var.service_protocol
-    },
-    {
-      containerPort = var.container_port_secondary
-      hostPort      = var.host_port_secondary
-      protocol      = var.service_protocol
-    }
-  ]:[
-    {
-      containerPort = var.container_port
-      hostPort      = var.host_port
-      protocol      = var.service_protocol
-    }
-  ]
-
-}
-
-module "container" {
-  count = var.limit_cpu_mem ? (var.cloudwatch_multiline_pattern == "" ? 0 : 1) : 0
+module "container_no_limits" {
+  count = var.limit_cpu_mem ? 0 : (var.cloudwatch_multiline_pattern == "" ? 0 : 1)
   source  = "cloudposse/ecs-container-definition/aws"
   version = "v0.61.1"
 
   container_name  = var.service_name
   container_image = "${var.ecr_repository_url}:${var.docker_image_tag}"
-
-  container_cpu = var.cpu_limit
-  container_memory = var.memory_limit
 
   essential = true
 
@@ -53,16 +28,13 @@ module "container" {
   stop_timeout      = var.stop_timeout
 }
 
-module "container_no_multiline" {
-  count = var.limit_cpu_mem ? (var.cloudwatch_multiline_pattern == "" ? 1 : 0) : 0
+module "container_no_multiline_no_limits" {
+  count = var.limit_cpu_mem ? 0 : (var.cloudwatch_multiline_pattern == "" ? 1 : 0)
   source  = "cloudposse/ecs-container-definition/aws"
   version = "v0.61.1"
 
   container_name  = var.service_name
   container_image = "${var.ecr_repository_url}:${var.docker_image_tag}"
-
-  container_cpu = var.cpu_limit
-  container_memory = var.memory_limit
 
   essential = true
 
@@ -86,16 +58,15 @@ module "container_no_multiline" {
   stop_timeout      = var.stop_timeout
 }
 
-resource "aws_ecs_task_definition" "this" {
-  count = var.limit_cpu_mem ? 1 : 0
+resource "aws_ecs_task_definition" "this_no_limits" {
+  count = var.limit_cpu_mem ? 0 : 1
   family                   = "${var.service_name}-${var.env_name}"
-  cpu                      = var.cpu_limit
   execution_role_arn       = var.ecs_role_arn
-  memory                   = var.memory_limit
+  memory                   = 0
   network_mode             = "bridge"
   task_role_arn            = var.ecs_role_arn
 
-  container_definitions = var.cloudwatch_multiline_pattern == "" ? module.container_no_multiline[0].json_map_encoded_list :  module.container[0].json_map_encoded_list
+  container_definitions = var.cloudwatch_multiline_pattern == "" ? module.container_no_multiline_no_limits[0].json_map_encoded_list :  module.container_no_limits[0].json_map_encoded_list
 
   lifecycle {
     create_before_destroy = true
