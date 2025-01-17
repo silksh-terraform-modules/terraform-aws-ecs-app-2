@@ -10,6 +10,10 @@ output "aws_lb_target_group_arn" {
   value = try(aws_lb_target_group.this[0].arn, "")
 }
 
+output "aws_lb_target_group_arn_suffix" {
+  value = try(aws_lb_target_group.this[0].arn_suffix, "")
+}
+
 output "app_service_name" {
   value = aws_ecs_service.this.name
 }
