@@ -10,35 +10,32 @@ locals {
       hostPort      = var.host_port_secondary
       protocol      = var.service_protocol
     }
-  ]:[
+    ] : [
     {
       containerPort = var.container_port
       hostPort      = var.host_port
       protocol      = var.service_protocol
     }
   ]
-
 }
 
-module "container" {
-  count = var.limit_cpu_mem ? (var.cloudwatch_multiline_pattern == "" ? 0 : 1) : 0
+module "container_multiline" {
+  count   = var.cloudwatch_multiline_pattern == "" ? 0 : 1
   source  = "cloudposse/ecs-container-definition/aws"
-  version = "v0.61.1"
+  version = "v0.61.2"
 
-  container_name  = var.service_name
-  container_image = "${var.ecr_repository_url}:${var.docker_image_tag}"
-
-  container_cpu = var.cpu_limit
-  container_memory = var.memory_limit
-
-  essential = true
+  container_name   = var.service_name
+  container_image  = "${var.ecr_repository_url}:${var.docker_image_tag}"
+  container_cpu    = var.limit_cpu_mem ? var.cpu_limit : null
+  container_memory = var.limit_cpu_mem ? var.memory_limit : null
+  essential        = true
 
   log_configuration = {
     logDriver = "awslogs",
     options = {
-      awslogs-region = var.aws_region,
-      awslogs-group = var.cloudwatch_log_group,
-      awslogs-stream-prefix = var.env_name,
+      awslogs-region            = var.aws_region,
+      awslogs-group             = var.cloudwatch_log_group,
+      awslogs-stream-prefix     = var.env_name,
       awslogs-multiline-pattern = var.cloudwatch_multiline_pattern
     }
   }
@@ -51,28 +48,27 @@ module "container" {
   environment_files = var.environment_files
   healthcheck       = var.healthcheck
   stop_timeout      = var.stop_timeout
+  restart_policy    = var.restart_policy
 }
 
 module "container_no_multiline" {
-  count = var.limit_cpu_mem ? (var.cloudwatch_multiline_pattern == "" ? 1 : 0) : 0
+  count   = var.cloudwatch_multiline_pattern == "" ? 1 : 0
   source  = "cloudposse/ecs-container-definition/aws"
-  version = "v0.61.1"
+  version = "v0.61.2"
 
-  container_name  = var.service_name
-  container_image = "${var.ecr_repository_url}:${var.docker_image_tag}"
-
-  container_cpu = var.cpu_limit
-  container_memory = var.memory_limit
-
-  essential = true
+  container_name   = var.service_name
+  container_image  = "${var.ecr_repository_url}:${var.docker_image_tag}"
+  container_cpu    = var.limit_cpu_mem ? var.cpu_limit : null
+  container_memory = var.limit_cpu_mem ? var.memory_limit : null
+  essential        = true
 
   log_configuration = {
     logDriver = "awslogs",
     options = {
-      awslogs-region = var.aws_region,
-      awslogs-group = var.cloudwatch_log_group,
+      awslogs-region        = var.aws_region,
+      awslogs-group         = var.cloudwatch_log_group,
       awslogs-stream-prefix = var.env_name,
-      # awslogs-multiline-pattern = var.cloudwatch_multiline_pattern
+      # awslogs-multiline-pattern = var.cloudwatch_multiline_pattern # if set cannot be null or empty
     }
   }
 
@@ -84,18 +80,19 @@ module "container_no_multiline" {
   environment_files = var.environment_files
   healthcheck       = var.healthcheck
   stop_timeout      = var.stop_timeout
+  restart_policy    = var.restart_policy
 }
 
 resource "aws_ecs_task_definition" "this" {
-  count = var.limit_cpu_mem ? 1 : 0
-  family                   = "${var.service_name}-${var.env_name}"
-  cpu                      = var.cpu_limit
-  execution_role_arn       = var.ecs_role_arn
-  memory                   = var.memory_limit
-  network_mode             = "bridge"
-  task_role_arn            = var.ecs_role_arn
+  # count              = var.limit_cpu_mem ? 1 : 0
+  family             = "${var.service_name}-${var.env_name}"
+  cpu                = var.limit_cpu_mem ? var.cpu_limit : null
+  execution_role_arn = var.ecs_role_arn
+  memory             = var.limit_cpu_mem ? var.memory_limit : 0
+  network_mode       = "bridge"
+  task_role_arn      = var.ecs_role_arn
 
-  container_definitions = var.cloudwatch_multiline_pattern == "" ? module.container_no_multiline[0].json_map_encoded_list :  module.container[0].json_map_encoded_list
+  container_definitions = var.cloudwatch_multiline_pattern == "" ? module.container_no_multiline[0].json_map_encoded_list : module.container_multiline[0].json_map_encoded_list
 
   lifecycle {
     create_before_destroy = true
@@ -104,9 +101,8 @@ resource "aws_ecs_task_definition" "this" {
   dynamic "volume" {
     for_each = length(var.volume_name) > 0 ? [1] : []
     content {
-      name = var.volume_name
+      name      = var.volume_name
       host_path = var.host_path
-
     }
   }
 
@@ -119,7 +115,7 @@ resource "aws_ecs_task_definition" "this" {
         for_each = length(var.efs_file_system_id) > 0 ? [1] : []
 
         content {
-          file_system_id = var.efs_file_system_id
+          file_system_id     = var.efs_file_system_id
           transit_encryption = "ENABLED"
 
           dynamic "authorization_config" {

@@ -3,57 +3,58 @@ variable "aws_region" {
 }
 
 variable "service_name" {
-  default = ""
+  default     = ""
   description = "service name"
 }
 
 variable "env_name" {
-  default = ""
+  default     = ""
   description = "environment name - for. ex. stage or prod"
 }
 
 variable "ecs_role_arn" {
   default = ""
-  type = string
+  type    = string
 }
 
 variable "docker_image_tag" {
-  default = ""
+  default     = ""
   description = "ECR docker image tag using for this service"
 }
 
 variable "ecr_repository_url" {
-  default = ""
+  default     = ""
   description = "ecr repository url"
 }
 
 variable "cpu_limit" {
-  default = "256"
+  # default     = "256"
+  default     = null
   description = "cpu limit for the task"
 }
 
 variable "memory_limit" {
-  default = "256"
+  default     = "256"
   description = "memory limit for the task"
 }
 
 variable "container_port" {
-  default = "8080"
+  default     = "8080"
   description = "port expanded by the task"
 }
 
 variable "container_port_secondary" {
-  default = ""
+  default     = ""
   description = "port expanded by the task"
 }
 
 variable "host_port" {
-  default = "0"
+  default     = "0"
   description = "port binded outside - 0 means dynamic port assignment"
 }
 
 variable "host_port_secondary" {
-  default = "0"
+  default     = "0"
   description = "port binded outside - 0 means dynamic port assignment, secondary port"
 }
 
@@ -66,8 +67,7 @@ variable "cloudwatch_log_group" {
 }
 
 variable "cloudwatch_multiline_pattern" {
-  # default = "^20"
-  default = ""
+  default = "^20"
 }
 
 variable "ssm_variables" {
@@ -90,7 +90,7 @@ variable "environment_files" {
 }
 
 variable "environment_bucket_id" {
-  type = string
+  type        = string
   description = "environmental s3 bucket ID - using for create gitlab variables template"
 }
 
@@ -112,7 +112,7 @@ variable "efs_access_point_id" {
 
 
 variable "cluster_id" {
-  default = ""
+  default     = ""
   description = "cluster ID"
 }
 
@@ -129,7 +129,7 @@ variable "desired_count" {
 }
 
 variable "healt_check_grace_period" {
-  default = 180
+  default     = 180
   description = "first healt check after startup"
 }
 
@@ -247,12 +247,12 @@ variable "cluster_name" {
 
 variable "other_service_dns_names" {
   default = []
-  type = list(string)
+  type    = list(string)
 }
 
 variable "other_secondary_service_dns_names" {
   default = []
-  type = list(string)
+  type    = list(string)
 }
 
 variable "healthcheck" {
@@ -267,27 +267,27 @@ variable "healthcheck" {
 }
 
 variable "volume_name" {
-  default = ""
+  default     = ""
   description = "volume name, same as sourceVolume in mount_points"
 }
 
 variable "host_path" {
-  default = ""
+  default     = ""
   description = "local path on host (volume mounted in fstab or local directory)"
 }
 
 variable "enable_execute_command" {
-  default = false
+  default     = false
   description = "enable or no ecs exec"
 }
 
 variable "stop_timeout" {
-  default = null
+  default     = null
   description = "stop timeout before SIGKILL"
-  type = number
+  type        = number
 }
 
-variable purchase_option {
+variable "purchase_option" {
   type        = string
   default     = ""
   description = "pass any preconfigured value of purchase-option attribute to have ability to control on which machine task should start"
@@ -310,6 +310,16 @@ variable "security_header_secondary" {
 }
 
 variable "limit_cpu_mem" {
-  type = bool
+  type    = bool
   default = false
+}
+
+variable "restart_policy" {
+  default = null
+  type = object({
+    enabled              = bool
+    ignoredExitCodes     = optional(list(number))
+    restartAttemptPeriod = optional(number)
+  })
+  description = "The restart policy for a container. When you set up a restart policy, Amazon ECS can restart the container without needing to replace the task."
 }
