@@ -60,7 +60,7 @@ resource "aws_ecs_task_definition" "this" {
   cpu                = var.limit_cpu_mem ? var.cpu_limit : null
   execution_role_arn = var.ecs_role_arn
   memory             = var.limit_cpu_mem ? var.memory_limit : 0
-  network_mode       = "bridge"
+  network_mode       = var.task_network_mode
   task_role_arn      = var.ecs_role_arn
 
   container_definitions = module.container[0].json_map_encoded_list

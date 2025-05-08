@@ -35,6 +35,23 @@ resource "aws_ecs_service" "this" {
     }
   }
 
+  dynamic "network_configuration" {
+      for_each = var.service_discovery_namespace != null ? [1] : []
+      content {
+          subnets          = var.subnet_ids
+          security_groups  = var.security_group_ids
+          assign_public_ip = var.assign_public_ip
+      }
+  }
+
+  dynamic "service_registries" {
+      for_each = var.service_discovery_namespace != null ? [1] : []
+      content {
+          registry_arn = aws_service_discovery_service.this[0].arn
+      }
+  }
+  
+
   ordered_placement_strategy {
     field = "attribute:ecs.availability-zone"
     type  = "spread"
@@ -88,4 +105,22 @@ resource "aws_route53_record" "secondary" {
     zone_id                = var.lb_zone_id_secondary
     evaluate_target_health = true
   }
+}
+
+resource "aws_service_discovery_service" "this" {
+    count = var.service_discovery_namespace != null ? 1 : 0
+    
+    name = var.service_name
+    dns_config {
+        namespace_id = var.service_discovery_namespace
+        
+        dns_records {
+            ttl  = 10
+            type = "A"
+        }
+    }
+
+    health_check_custom_config {
+        failure_threshold = 1
+    }
 }

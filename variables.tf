@@ -323,3 +323,32 @@ variable "restart_policy" {
   })
   description = "The restart policy for a container. When you set up a restart policy, Amazon ECS can restart the container without needing to replace the task."
 }
+
+variable "task_network_mode" {
+  default = "bridge"
+  description = "network mode for the task"
+}
+
+variable "service_discovery_namespace" {
+  description = "The ID of the service discovery namespace"
+  type        = string
+  default     = null
+}
+
+variable "subnet_ids" {
+  description = "List of subnet IDs for the ECS service"
+  type        = list(string)
+  default     = []
+}
+
+variable "security_group_ids" {
+  description = "List of security group IDs for the ECS service"
+  type        = list(string)
+  default     = []
+}
+
+variable "assign_public_ip" {
+  description = "Whether to assign a public IP to the ECS service"
+  type        = bool
+  default     = false
+}
