@@ -62,7 +62,7 @@ resource "aws_ecs_task_definition" "this" {
   network_mode       = var.task_network_mode
   task_role_arn      = var.ecs_role_arn
 
-  container_definitions = module.container[0].json_map_encoded_list
+  container_definitions = module.container.json_map_encoded_list
   
   lifecycle {
     create_before_destroy = true
