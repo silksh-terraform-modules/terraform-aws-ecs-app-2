@@ -20,7 +20,6 @@ locals {
 }
 
 module "container" {
-  count   = var.cloudwatch_multiline_pattern == "" ? 0 : 1
   source  = "cloudposse/ecs-container-definition/aws"
   version = "v0.61.2"
 
