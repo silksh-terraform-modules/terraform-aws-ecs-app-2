@@ -36,7 +36,7 @@ resource "aws_ecs_service" "this" {
   }
 
   dynamic "network_configuration" {
-      for_each = var.service_discovery_namespace != null ? [1] : []
+      for_each = var.use_discovery_namespace ? [1] : []
       content {
           subnets          = var.subnet_ids
           security_groups  = var.security_group_ids
@@ -45,7 +45,7 @@ resource "aws_ecs_service" "this" {
   }
 
   dynamic "service_registries" {
-      for_each = var.service_discovery_namespace != null ? [1] : []
+      for_each = var.use_discovery_namespace ? [1] : []
       content {
           registry_arn = aws_service_discovery_service.this[0].arn
       }
@@ -108,7 +108,7 @@ resource "aws_route53_record" "secondary" {
 }
 
 resource "aws_service_discovery_service" "this" {
-    count = var.service_discovery_namespace != null ? 1 : 0
+    count = var.use_discovery_namespace ? 1 : 0
     
     name = var.service_name
     dns_config {

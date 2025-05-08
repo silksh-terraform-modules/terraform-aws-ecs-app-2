@@ -352,3 +352,10 @@ variable "assign_public_ip" {
   type        = bool
   default     = false
 }
+
+variable "use_discovery_namespace" {
+  description = "Whether to use service discovery namespace"
+  type        = bool
+  default     = false
+}
+
