@@ -19,8 +19,7 @@ locals {
   ]
 }
 
-module "container_multiline" {
-  count   = var.cloudwatch_multiline_pattern == "" ? 0 : 1
+module "container" {
   source  = "cloudposse/ecs-container-definition/aws"
   version = "v0.61.2"
 
@@ -33,13 +32,13 @@ module "container_multiline" {
   log_configuration = {
     logDriver = "awslogs",
     options = merge(
-    {
-      awslogs-region = var.aws_region,
-      awslogs-group = var.cloudwatch_log_group,
-      awslogs-stream-prefix = var.env_name
-    },
-    var.cloudwatch_multiline_pattern != null ? { awslogs-multiline-pattern = var.cloudwatch_multiline_pattern } : {}
-  )
+      {
+        awslogs-region        = var.aws_region,
+        awslogs-group         = var.cloudwatch_log_group,
+        awslogs-stream-prefix = var.env_name
+      },
+      var.cloudwatch_multiline_pattern != null ? { awslogs-multiline-pattern = var.cloudwatch_multiline_pattern } : {}
+    )
   }
 
   port_mappings = length(var.service_dns_name) > 0 ? local.port_mappings : null
@@ -63,8 +62,8 @@ resource "aws_ecs_task_definition" "this" {
   network_mode       = "bridge"
   task_role_arn      = var.ecs_role_arn
 
-  container_definitions = module.container[0].json_map_encoded_list
-  
+  container_definitions = module.container.json_map_encoded_list
+
   lifecycle {
     create_before_destroy = true
   }
