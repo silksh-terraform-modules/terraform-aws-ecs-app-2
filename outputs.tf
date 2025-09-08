@@ -25,3 +25,7 @@ output "app_repository_url" {
 output "app_env_bucket_id" {
   value = var.environment_bucket_id
 }
+
+output "app_task_definition_arn" {
+  value = try(aws_ecs_task_definition.this.arn, "")
+}
