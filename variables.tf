@@ -323,3 +323,8 @@ variable "restart_policy" {
   })
   description = "The restart policy for a container. When you set up a restart policy, Amazon ECS can restart the container without needing to replace the task."
 }
+
+variable "command" {
+  default     = null
+  description = "command passed to container"
+}

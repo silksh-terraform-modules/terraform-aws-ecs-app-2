@@ -27,6 +27,7 @@ module "container" {
   container_image  = "${var.ecr_repository_url}:${var.docker_image_tag}"
   container_cpu    = var.limit_cpu_mem ? var.cpu_limit : null
   container_memory = var.limit_cpu_mem ? var.memory_limit : null
+  command          = try(var.command, null)
   essential        = true
 
   log_configuration = {
