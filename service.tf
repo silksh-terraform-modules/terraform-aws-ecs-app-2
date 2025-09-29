@@ -8,6 +8,7 @@ resource "aws_ecs_service" "this" {
   launch_type                        = var.launch_type
   name                               = var.service_name
   #propagate_tags                     = "NONE"
+  availability_zone_rebalancing      = var.availability_zone_rebalancing
   scheduling_strategy = "REPLICA"
   # task_definition                    = var.limit_cpu_mem ? aws_ecs_task_definition.this[0].arn : aws_ecs_task_definition.this_no_limits[0].arn
   task_definition        = aws_ecs_task_definition.this.arn

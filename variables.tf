@@ -328,3 +328,8 @@ variable "command" {
   default     = null
   description = "command passed to container"
 }
+
+variable "availability_zone_rebalancing" {
+  default     = "ENABLED"
+  description = ""
+}
