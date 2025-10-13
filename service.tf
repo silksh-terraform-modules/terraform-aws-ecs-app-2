@@ -55,7 +55,7 @@ resource "aws_ecs_service" "this" {
   }
 
   dynamic "placement_constraints" {
-    for_each = length(var.one_task_per_instance) == true ? [1] : []
+    for_each = var.one_task_per_instance == true ? [1] : []
     content {
       type       = "distinctInstance"
     }
