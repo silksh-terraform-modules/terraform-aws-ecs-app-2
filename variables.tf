@@ -293,6 +293,12 @@ variable "purchase_option" {
   description = "pass any preconfigured value of purchase-option attribute to have ability to control on which machine task should start"
 }
 
+variable "one_task_per_instance" {
+  type = bool
+  default = false
+  description = "Run one task per container instance"
+}
+
 variable "load_balancing_algorithm_type" {
   default = "round_robin"
 }

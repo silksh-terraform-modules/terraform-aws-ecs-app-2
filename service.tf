@@ -54,6 +54,13 @@ resource "aws_ecs_service" "this" {
     }
   }
 
+  dynamic "placement_constraints" {
+    for_each = length(var.one_task_per_instance) == true ? [1] : []
+    content {
+      type       = "distinctInstance"
+    }
+  }
+
   depends_on = [
     aws_lb_target_group.this[0]
   ]
