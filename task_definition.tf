@@ -72,7 +72,7 @@ resource "aws_ecs_task_definition" "this" {
     for_each = length(var.purchase_option) > 0 ? [1] : []
     content {
       type = "memberOf"
-      expression = "attribute:ecs.purchase-option == ${var.purchase_option}"
+      expression = "attribute:purchase-option == ${var.purchase_option}"
     }
   }
 
