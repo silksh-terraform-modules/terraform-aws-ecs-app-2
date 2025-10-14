@@ -68,6 +68,13 @@ resource "aws_ecs_task_definition" "this" {
   lifecycle {
     create_before_destroy = true
   }
+  dynamic "placement_constraints" {
+    for_each = length(var.purchase_option) > 0 ? [1] : []
+    content {
+      type = "memberOf"
+      expression = "attribute:ecs.purchase-option == ${var.purchase_option}"
+    }
+  }
 
   dynamic "volume" {
     for_each = length(var.volume_name) > 0 ? [1] : []
