@@ -63,9 +63,17 @@ resource "aws_ecs_task_definition" "this" {
   task_role_arn      = var.ecs_role_arn
 
   container_definitions = module.container.json_map_encoded_list
-  
+
   lifecycle {
     create_before_destroy = true
+  }
+
+  dynamic "placement_constraints" {
+    for_each = length(var.purchase_option) > 0 ? [1] : []
+    content {
+      type = "memberOf"
+      expression = "attribute:purchase-option == ${var.purchase_option}"
+    }
   }
 
   dynamic "volume" {
