@@ -36,14 +36,20 @@ resource "aws_ecs_service" "this" {
     }
   }
 
-  ordered_placement_strategy {
-    field = "attribute:ecs.availability-zone"
-    type  = "spread"
+  dynamic "ordered_placement_strategy" {
+    for_each = var.disable_placement_strategy == false ? [1] : []
+    content {
+      field = "attribute:ecs.availability-zone"
+      type  = "spread"
+    }
   }
 
-  ordered_placement_strategy {
-    field = "instanceId"
-    type  = "spread"
+  dynamic "ordered_placement_strategy" {
+    for_each = var.disable_placement_strategy == false ? [1] : []
+    content {
+      field = "instanceId"
+      type  = "spread"
+    }
   }
 
   dynamic "placement_constraints" {
