@@ -50,16 +50,21 @@ resource "aws_ecs_service" "this" {
           registry_arn = aws_service_discovery_service.this[0].arn
       }
   }
-  
 
-  ordered_placement_strategy {
-    field = "attribute:ecs.availability-zone"
-    type  = "spread"
+  dynamic "ordered_placement_strategy" {
+    for_each = var.disable_placement_strategy == false ? [1] : []
+    content {
+      field = "attribute:ecs.availability-zone"
+      type  = "spread"
+    }
   }
 
-  ordered_placement_strategy {
-    field = "instanceId"
-    type  = "spread"
+  dynamic "ordered_placement_strategy" {
+    for_each = var.disable_placement_strategy == false ? [1] : []
+    content {
+      field = "instanceId"
+      type  = "spread"
+    }
   }
 
   dynamic "placement_constraints" {
@@ -109,11 +114,11 @@ resource "aws_route53_record" "secondary" {
 
 resource "aws_service_discovery_service" "this" {
     count = var.use_discovery_namespace ? 1 : 0
-    
+
     name = var.service_name
     dns_config {
         namespace_id = var.service_discovery_namespace
-        
+
         dns_records {
             ttl  = 10
             type = "A"
