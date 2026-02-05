@@ -345,3 +345,17 @@ variable "disable_placement_strategy" {
   default = false
   description = "Set to true if you have deploy_min_percent >= 100 and only one instance"
 }
+
+
+variable "stickiness_enabled_secondary" {
+  default = false
+  type = bool
+}
+
+variable "stickiness_cookie_duration_secondary" {
+  default = 86400
+}
+
+variable "stickiness_type_secondary" {
+  default = "lb_cookie"
+}

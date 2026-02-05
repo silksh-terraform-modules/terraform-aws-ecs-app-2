@@ -1,9 +1,9 @@
 resource "aws_lb_target_group" "secondary" {
-    count = length(var.lb_listener_arn_secondary) > 0 ? 1 : 0      
+    count = length(var.lb_listener_arn_secondary) > 0 ? 1 : 0
     deregistration_delay          = var.deregistration_delay
     load_balancing_algorithm_type = var.load_balancing_algorithm_type_secondary
     name                          = "${var.service_name}-${var.env_name}-internal-${substr(uuid(), 0, 3)}"
-    port                          = length(var.container_port_secondary) > 0 ? var.container_port_secondary : var.container_port 
+    port                          = length(var.container_port_secondary) > 0 ? var.container_port_secondary : var.container_port
     protocol                      = "HTTP"
     slow_start                    = 0
     target_type                   = "instance"
@@ -22,9 +22,9 @@ resource "aws_lb_target_group" "secondary" {
     }
 
     stickiness {
-        cookie_duration = var.stickiness_cookie_duration
-        enabled         = var.stickiness_enabled
-        type            = var.stickiness_type
+        cookie_duration = var.stickiness_cookie_duration_secondary
+        enabled         = var.stickiness_enabled_secondary
+        type            = var.stickiness_type_secondary
     }
 
     lifecycle {
@@ -34,11 +34,11 @@ resource "aws_lb_target_group" "secondary" {
 }
 
 resource "aws_lb_listener_rule" "secondary" {
-  
+
   count = length(var.lb_listener_arn_secondary) > 0 ? 1 : 0
 
   listener_arn = var.lb_listener_arn_secondary
-  
+
   condition {
     host_header {
       values = [
