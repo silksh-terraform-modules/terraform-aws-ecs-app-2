@@ -368,3 +368,9 @@ variable "use_discovery_namespace" {
   type        = bool
   default     = false
 }
+
+variable "disable_placement_strategy" {
+  type        = bool
+  default     = false
+  description = "Set to true if you have deploy_min_percent >= 100 and only one instance"
+}
