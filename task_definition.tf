@@ -1,5 +1,5 @@
 locals {
-  port_mappings = length(var.container_port_secondary) > 0 ? [
+  base_port_mappings = length(var.container_port_secondary) > 0 ? [
     {
       containerPort = var.container_port
       hostPort      = var.host_port
@@ -17,6 +17,8 @@ locals {
       protocol      = var.service_protocol
     }
   ]
+
+  port_mappings = concat(local.base_port_mappings, var.extra_port_mappings)
 }
 
 module "container" {
@@ -32,16 +34,16 @@ module "container" {
   log_configuration = {
     logDriver = "awslogs",
     options = merge(
-    {
-      awslogs-region = var.aws_region,
-      awslogs-group = var.cloudwatch_log_group,
-      awslogs-stream-prefix = var.env_name
-    },
-    var.cloudwatch_multiline_pattern != null ? { awslogs-multiline-pattern = var.cloudwatch_multiline_pattern } : {}
-  )
+      {
+        awslogs-region        = var.aws_region,
+        awslogs-group         = var.cloudwatch_log_group,
+        awslogs-stream-prefix = var.env_name
+      },
+      var.cloudwatch_multiline_pattern != null ? { awslogs-multiline-pattern = var.cloudwatch_multiline_pattern } : {}
+    )
   }
 
-  port_mappings = length(var.service_dns_name) > 0 ? local.port_mappings : null
+  port_mappings = (length(var.service_dns_name) > 0 || length(var.extra_port_mappings) > 0) ? local.port_mappings : null
 
   map_secrets       = var.ssm_variables
   map_environment   = var.task_variables
@@ -71,7 +73,7 @@ resource "aws_ecs_task_definition" "this" {
   dynamic "placement_constraints" {
     for_each = length(var.purchase_option) > 0 ? [1] : []
     content {
-      type = "memberOf"
+      type       = "memberOf"
       expression = "attribute:purchase-option == ${var.purchase_option}"
     }
   }

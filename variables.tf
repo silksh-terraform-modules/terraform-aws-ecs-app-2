@@ -62,6 +62,16 @@ variable "service_protocol" {
   default = "tcp"
 }
 
+variable "extra_port_mappings" {
+  description = "Additional port mappings for the container (with awsvpc hostPort must equal containerPort)"
+  type = list(object({
+    containerPort = number
+    hostPort      = number
+    protocol      = string
+  }))
+  default = []
+}
+
 variable "cloudwatch_log_group" {
   default = "ecs"
 }
@@ -325,7 +335,7 @@ variable "restart_policy" {
 }
 
 variable "task_network_mode" {
-  default = "bridge"
+  default     = "bridge"
   description = "network mode for the task"
 }
 
@@ -357,10 +367,4 @@ variable "use_discovery_namespace" {
   description = "Whether to use service discovery namespace"
   type        = bool
   default     = false
-}
-
-variable "disable_placement_strategy" {
-  type = bool
-  default = false
-  description = "Set to true if you have deploy_min_percent >= 100 and only one instance"
 }
